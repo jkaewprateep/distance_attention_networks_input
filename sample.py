@@ -39,6 +39,9 @@ print(config)
 : Variables
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 actions = { "none_1": K_h, "left": K_a, "down": K_s, "right": K_d, "up": K_w, "action": K_SPACE }
+dic_itemtype = { "player" : 0, "monster" : 1, "coin" : 2, "background" : 3, "fireball" : 4, "ladder" : 5, "wall" : 6, "allies" : 7 }
+dic_itempriority = { "player" : 0, "monster" : 4, "coin" : 2, "background" : 0, "fireball" : 4, "ladder" : 9, "wall" : -9, "allies" : 50 }
+
 nb_frames = 100000000000
 
 global lives
@@ -53,19 +56,17 @@ gamescores = 0
 
 ################ Mixed of data input  ###############
 global DATA
-DATA = tf.zeros([1, 1, 1, 30], dtype=tf.float32)
+DATA = tf.zeros([1, 1, 1, 1086], dtype=tf.float32)
 global LABEL
 LABEL = tf.zeros([1, 1, 1, 1], dtype=tf.float32)
 
 for i in range(15):
-	DATA_row = tf.constant([ 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999,
-				-9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999 ], shape=(1, 1, 1, 30), dtype=tf.float32)		
+	DATA_row = -9999 * tf.ones([1, 1, 1, 1086], dtype=tf.float32)		
 	DATA = tf.experimental.numpy.vstack([DATA, DATA_row])
 	LABEL = tf.experimental.numpy.vstack([LABEL, tf.constant(0, shape=(1, 1, 1, 1))])
 	
 for i in range(15):
-	DATA_row = tf.constant([ -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999,
-				9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999, -9999, 9999 ], shape=(1, 1, 1, 30), dtype=tf.float32)		
+	DATA_row = 9999 * tf.ones([1, 1, 1, 1086], dtype=tf.float32)			
 	DATA = tf.experimental.numpy.vstack([DATA, DATA_row])
 	LABEL = tf.experimental.numpy.vstack([LABEL, tf.constant(9, shape=(1, 1, 1, 1))])	
 	
@@ -91,16 +92,22 @@ if not exists(checkpoint_dir) :
 def elementPhase(elem):
 
     return elem[1]
+
+# take memeber element for sort
+def elementDistancePriorityPhase(elem):
+	return elem[1:3]
 	
-def elementListCreate( list_item, bRelativePlayer=False ):
+def elementListCreate( list_item, type, bRelativePlayer=False ):
 
 	player = read_current_state("player")
-	list_temp = [ ( 6, int( pow( pow( x - player[0][0], 2 ) + pow( y - player[0][1], 2 ), 0.5 ) ), x, y ) for ( x, y ) in list_item if y <= player[0][1] ]
+	priority = [ y for ( x, y ) in dic_itemtype.items() if y == type]
+	priority = list(dic_itempriority.values())[int(priority[0])]
+	list_temp = [ ( type, priority, int( pow( pow( x - player[0][0], 2 ) + pow( y - player[0][1], 2 ), 0.5 ) ), x, y ) for ( x, y ) in list_item if y <= player[0][1] ]
 	
 	if len( list_temp ) > 0 :
 		pass
 	else :
-		list_temp.append( [ 5, -999, -999, -999 ] )
+		list_temp.append( [ type, priority, -999, -999, -999 ] )
 		
 	list_temp.sort(key=elementPhase)
 
@@ -164,6 +171,10 @@ def	read_current_state( string_gamestate ):
 			temp.append( ladder.getPosition() )	
 		return temp
 		
+	elif string_gamestate in ['map']:
+		Map_Game = game_console.newGame.map	# 30x80
+		return Map_Game	
+		
 	else:
 		return None
 		
@@ -196,6 +207,8 @@ def update_DATA( action ):
 	
 	steps = steps + 1
 	
+	map = read_current_state("map")
+	
 	gamescores = read_current_state("score")
 	game_over = read_current_state("game_over")
 	fireballGroup = read_current_state("fireballGroup")
@@ -207,97 +220,68 @@ def update_DATA( action ):
 	ladders = read_current_state("ladder")
 	wall = read_current_state("wall")
 	
-	list_player = [ ( 0, x, y ) for ( x, y ) in player if y <= player[0][1] ]
-	list_monster = [ ( 1, x, y ) for ( x, y ) in monsters if y <= player[0][1] ]
-	list_coin = [ ( 2, x, y ) for ( x, y ) in coinGroup if y <= player[0][1] ]
-	list_fireball = [ ( 4, x, y ) for ( x, y ) in fireballGroup if y <= player[0][1] ]
-		
-	if len( list_coin ) > 2 :
-		pass
-	else :
-		list_coin.append( [ 2, -999, -999 ] )
-		
-	if len( list_coin ) > 2 :
-		pass
-	else :
-		list_coin.append( [ 2, -999, -999 ] )
-		
-	if len( list_fireball ) > 2 :
-		pass
-	else :
-		list_fireball.append( [ 4, -999, -999 ] )
-		
-	if len( list_fireball ) > 2 :
-		pass
-	else :
-		list_fireball.append( [ 4, -999, -999 ] )
-		
-	if len( list_monster ) > 2 :
-		pass
-	else :
-		list_monster.append( [ 1, -999, -999 ] )
-		
-	if len( list_monster ) > 2 :
-		pass
-	else :
-		list_monster.append( [ 1, -999, -999 ] )
-		
-		
+	### determine player###
+	list_player = elementListCreate( player, 0, bRelativePlayer=True )
+	### end ###	
+	
+	### determine coins###
+	list_coin = elementListCreate( coinGroup, 2, bRelativePlayer=True )
+	### end ###	
+	
+	### determine monster###
+	list_monster = elementListCreate( monsters, 1, bRelativePlayer=True )
+	### end ###	
+	
+	### determine firewall###
+	list_fireball = elementListCreate( fireballGroup, 4, bRelativePlayer=True )
+	### end ###	
+	
 	### determine alley allies ###
-	list_alley = elementListCreate( allies, bRelativePlayer=True )
+	list_alley = elementListCreate( allies, 7, bRelativePlayer=True )
 	### end ###	
 	
 	### determine ladder distance ###
-	list_ladder = elementListCreate( ladders, bRelativePlayer=True )
+	list_ladder = elementListCreate( ladders, 5, bRelativePlayer=True )
 	### end ###	
 	
 	### determine wall distance ###
-	list_wall = elementListCreate( wall, bRelativePlayer=False )
+	list_wall = elementListCreate( wall, 6, bRelativePlayer=False )
 	### end ###	
 	
 	contrl = steps + gamescores + ( 50 * reward )
-	contr2 = list_ladder[len(list_ladder) - 1][1]
+	contr2 = 1
 	contr3 = 1
 	
-	coff_0 = list_player[0][1]
-	coff_1 = list_player[0][2]
-	coff_2 = list_alley[0][1]
-	coff_3 = list_alley[0][3]
-	coff_4 = list_coin[0][1]
-	coff_5 = list_coin[0][2]
-	coff_6 = list_coin[1][1]
-	coff_7 = list_coin[1][2]
-	coff_8 = list_fireball[0][1]
-	coff_9 = list_fireball[0][2]
-	coff_10 = list_fireball[1][1]
-	coff_11 = list_fireball[1][2]
-	coff_12 = list_ladder[0][1]
-	coff_13 = list_ladder[1][1]
-	coff_14 = list_ladder[2][1]
-	coff_15 = list_ladder[3][1]
-	coff_16 = list_monster[0][2]
-	coff_17 = list_monster[0][2]
-	coff_18 = list_monster[1][2]
-	coff_19 = list_monster[1][2]
+	list_items_radious = []
+	list_items_radious.extend( list_coin )
+	list_items_radious.extend( list_monster )
+	list_items_radious.extend( list_fireball )
+	list_items_radious.extend( list_alley )
+	list_items_radious.extend( list_ladder )
+	# list_items_radious.extend( list_wall )
 	
-	coff_20 = list_wall[0][1]
-	coff_21 = list_wall[1][1]
-	coff_22 = list_wall[2][1]
-	coff_23 = list_wall[3][1]
-	coff_24 = list_wall[4][1]
-	coff_25 = list_wall[5][1]
-	coff_26 = 1
+	list_items_radious.sort(key=elementDistancePriorityPhase)
+	
+	coff_00 = coff_01 = coff_02 = coff_03 = coff_04 = coff_05 = coff_06 = coff_07 = coff_08 = coff_09 = coff_10 = coff_11 = coff_12 = coff_13 = coff_14 = coff_15 = coff_16 = coff_17 = coff_18 = coff_19 = coff_20 = coff_21 = coff_22 = coff_23 = coff_24 = coff_25 = coff_26 = 0
+	
+	for i in range( 27 ) :
+		name  = 'coff_' + str(i).zfill(2)
+		value = list_items_radious[i][1]
+		locals()[name] = value
+
 
 	action_name = [ x for ( x, y ) in actions.items() if y == action]
 	
-	print( "steps: " + str( steps ).zfill(6) + " action: " + str(action_name) + " coff_0: " + str(int(coff_0)).zfill(6) + " coff_1: " + str(int(coff_1)).zfill(6) + " coff_2: " 
-			+ str(int(coff_2)).zfill(6) + " coff_3: " + str(int(coff_3)).zfill(6) + " coff_4: " + str(int(coff_4)).zfill(6) + " coff_5: " + str(int(coff_5)).zfill(6)
+	print( "steps: " + str( steps ).zfill(6) + " action: " + str(action_name) + " coff_00: " + str(int(coff_00)).zfill(6) + " coff_01: " + str(int(coff_01)).zfill(6) + " coff_02: " 
+			+ str(int(coff_02)).zfill(6) + " coff_03: " + str(int(coff_03)).zfill(6) + " coff_04: " + str(int(coff_04)).zfill(6) + " coff_05: " + str(int(coff_05)).zfill(6)
 	)
 	
-	DATA_row = tf.constant([ contrl, contr2, contr3, coff_0, coff_1, coff_2, coff_3, coff_4, coff_5, coff_6, coff_7, coff_8, coff_9, coff_10, coff_11, coff_12, coff_13, coff_14, coff_15, coff_16, coff_17, coff_18, coff_19, 
-			coff_20, coff_21, coff_22, coff_23, coff_24, coff_25, coff_26 ], shape=(1, 1, 1, 30), dtype=tf.float32)
+	DATA_row = tf.constant([ contrl, contr2, contr3, coff_00, coff_01, coff_02, coff_03, coff_04, coff_05, coff_06, coff_07, coff_08, coff_09, coff_10, coff_11, coff_12, coff_13, coff_14, coff_15, 
+			coff_16, coff_17, coff_18, coff_19, coff_20, coff_21, coff_22, coff_23, coff_24, coff_25, coff_26 ], shape=(1, 1, 1, 30), dtype=tf.float32)
+			
+	map_row = tf.constant([ map ], shape=(1, 1, 1, 1056), dtype=tf.float32)
+	DATA_row = tf.concat([ DATA_row, map_row ], axis=3)
 
-	
 	DATA = tf.experimental.numpy.vstack([DATA, DATA_row])
 	DATA = DATA[-30:,:,:,:]
 	
@@ -362,7 +346,7 @@ dataset = tf.data.Dataset.from_tensor_slices((DATA, LABEL))
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
 : Model Initialize
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""
-input_shape = (1, 30)
+input_shape = (1, 1086)
 
 model = tf.keras.models.Sequential([
 	tf.keras.layers.InputLayer(input_shape=input_shape),
