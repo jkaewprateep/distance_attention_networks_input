@@ -3,6 +3,7 @@ For study distance input networks for machine learning problems, snake ladders, 
 
 ## Objectives ##
 
+🧸💬 How do we reach the last room in the mazes from the current room is to find a tunnel and paths when the tunnel is a ladder and the path is distance.
 
 ```
 contrl = steps + gamescores + ( 50 * reward )
@@ -12,6 +13,7 @@ contr3 = 1
 
 ## List and relative distance crate ##
 
+👧💬 With simple problem type we know that ```distance``` value can be estimate from x and y values of player curser and target as ```pow( X1 - X2 ) + pow( Y1 - Y2 )```.
 
 ```
 # take memeber element for sort
