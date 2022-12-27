@@ -1,6 +1,17 @@
 # distance_attention_networks_input
 For study distance input networks for machine learning problem
 
+## Objectives ##
+
+
+```
+contrl = steps + gamescores + ( 50 * reward )
+contr2 = list_ladder[len(list_ladder) - 1][1]
+contr3 = 1
+```
+
+## List and relative distance crate ##
+
 
 ```
 # take memeber element for sort
