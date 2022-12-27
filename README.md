@@ -1,5 +1,5 @@
 # distance_attention_networks_input
-For study distance input networks for machine learning problem
+For study distance input networks for machine learning problem, snake ladders or turnels problem we can add the problem parameters into our AI training templates for study and solve the problem with conditions you inputs.
 
 ## Objectives ##
 
