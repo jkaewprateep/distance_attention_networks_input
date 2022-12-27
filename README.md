@@ -15,7 +15,7 @@ contr2 = list_ladder[len(list_ladder) - 1][1]
 contr3 = 1
 ```
 
-## List and relative distance crate ##
+## List and relative distance create ##
 
 👧💬 With simple problem type we know that ```distance``` value can be estimate from x and y values of player curser and target as ```pow( X1 - X2 ) + pow( Y1 - Y2 )```.
 
