@@ -3,6 +3,8 @@ For study distance input networks for machine learning problems, snake ladders, 
 
 In some problems, we cannot input all parameters and wait until AI can find the relationship of all distances, ( X1 - X2 ) and ( Y1 - Y2 ) but the AI can simply find their relationship from minimum or maximum of the distance input ( item1, 5 ), ( item2, 10 ) and ( item3, 15 ). The AI networks learn priority and the object's distance the problem is AI learns of the object's types and actions, not equations formula to find its distance or colors.
 
+🧸💬 It challenges conditions as most of the robot does or sort algorithms you can implement further, distance is something quick to determine the priority or it is the priority but it is not only distance and object types. Some of the traveling path problems are considered steps and relativity of each object as rules or ladder which is why we create a list of items as ```( types, relative distance, position X, position Y )```
+
 ## Objectives ##
 
 🧸💬 How do we reach the last room in the mazes from the current room is to find a tunnel and paths when the tunnel is a ladder and the path is distance.
