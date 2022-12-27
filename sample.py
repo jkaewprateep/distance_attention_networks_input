@@ -95,7 +95,7 @@ def elementPhase(elem):
 def elementListCreate( list_item, bRelativePlayer=False ):
 
 	player = read_current_state("player")
-	list_temp = [ ( 6, int( pow( pow( x - player[0][0], 2 ) + pow( y - player[0][1], 2 ), 0.5 ) ), x, y ) for ( x, y ) in list_item if y >= player[0][1] ]
+	list_temp = [ ( 6, int( pow( pow( x - player[0][0], 2 ) + pow( y - player[0][1], 2 ), 0.5 ) ), x, y ) for ( x, y ) in list_item if y <= player[0][1] ]
 	
 	if len( list_temp ) > 0 :
 		pass
@@ -207,10 +207,10 @@ def update_DATA( action ):
 	ladders = read_current_state("ladder")
 	wall = read_current_state("wall")
 	
-	list_player = [ ( 0, x, y ) for ( x, y ) in player if y >= player[0][1] ]
-	list_monster = [ ( 1, x, y ) for ( x, y ) in monsters if y >= player[0][1] ]
-	list_coin = [ ( 2, x, y ) for ( x, y ) in coinGroup if y >= player[0][1] ]
-	list_fireball = [ ( 4, x, y ) for ( x, y ) in fireballGroup if y >= player[0][1] ]
+	list_player = [ ( 0, x, y ) for ( x, y ) in player if y <= player[0][1] ]
+	list_monster = [ ( 1, x, y ) for ( x, y ) in monsters if y <= player[0][1] ]
+	list_coin = [ ( 2, x, y ) for ( x, y ) in coinGroup if y <= player[0][1] ]
+	list_fireball = [ ( 4, x, y ) for ( x, y ) in fireballGroup if y <= player[0][1] ]
 		
 	if len( list_coin ) > 2 :
 		pass
