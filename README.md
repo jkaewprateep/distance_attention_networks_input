@@ -42,8 +42,14 @@ list_ladder = elementListCreate( ladders, bRelativePlayer=True )
 
 ## Result ##
 
+MonsterKong player curser try all leftside are, right side and tunnel.
+
 ![sample picutre](https://github.com/jkaewprateep/distance_attention_networks_input/blob/main/01.png?raw=true "sample picutre")
 
+Random action play on items, ladder.
+
 ![sample picutre](https://github.com/jkaewprateep/distance_attention_networks_input/blob/main/02.png?raw=true "sample picutre")
+
+Gamescores condition still be consider.
 
 ![sample picutre](https://github.com/jkaewprateep/distance_attention_networks_input/blob/main/MonsterKong.gif?raw=true "sample picutre")
