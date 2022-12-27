@@ -1,7 +1,7 @@
 # distance_attention_networks_input
 For study distance input networks for machine learning problems, snake ladders, or tunnel shared distance. We can add the problem parameters into our AI training templates for study and solve the problem with the conditions you input.
 
-In some problems, we cannot input all parameters and wait until AI can find the relationship of all distances, ( X1 - X2 ) and ( Y1 - Y2 ) but the AI can simply find their relationship from minimum or maximum of the distance input ( item1, 5 ), ( item2, 10 ) and ( item3, 15 ). The AI networks learn priority and the object's distance the problem is AI learns of the object's types and actions, not equations formula to find its distance or colors.
+In some problems, we cannot input all parameters and wait until AI can find the relationship of all distances, ```( X1 - X2 ) and ( Y1 - Y2 )``` but the AI can simply find their relationship from minimum or maximum of the distance input ```( item1, 5 ), ( item2, 10 ) and ( item3, 15 )```. The AI networks learn priority and the object's distance the problem is AI learns of the object's types and actions, not equations formula to find its distance or colors.
 
 🧸💬 It challenges conditions as most of the robot does or sort algorithms you can implement further, distance is something quick to determine the priority or it is the priority but it is not only distance and object types. Some of the traveling path problems are considered steps and relativity of each object as rules or ladder which is why we create a list of items as ```( types, relative distance, position X, position Y )```
 
