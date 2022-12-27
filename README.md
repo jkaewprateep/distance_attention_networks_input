@@ -2,6 +2,31 @@
 For study distance input networks for machine learning problem
 
 
+```
+# take memeber element for sort
+def elementPhase(elem):
+
+    return elem[1]
+	
+def elementListCreate( list_item, bRelativePlayer=False ):
+
+	player = read_current_state("player")
+	list_temp = [ ( 6, int( pow( pow( x - player[0][0], 2 ) + 
+                              pow( y - player[0][1], 2 ), 0.5 ) ), x, y ) for ( x, y ) in list_item if y <= player[0][1] ]
+	
+	if len( list_temp ) > 0 :
+		pass
+	else :
+		list_temp.append( [ 5, -999, -999, -999 ] )
+		
+	list_temp.sort(key=elementPhase)
+
+	return list_temp
+  
+ladders = read_current_state("ladder")
+list_ladder = elementListCreate( ladders, bRelativePlayer=True )
+```
+
 ## Result ##
 
 ![sample picutre](https://github.com/jkaewprateep/distance_attention_networks_input/blob/main/01.png?raw=true "sample picutre")
